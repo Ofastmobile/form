@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Brief — Bofast World</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #ffffff;
+      --surface:   #f5f5f5;
+      --card:      #f9f9f9;
+      --border:    #e0e0e0;
+      --purple:    #7c5cbf;
+      --purple-lt: #9b7de0;
+      --blue:      #2d5be3;
+      --gold:      #c9973a;
+      --gold-lt:   #e8b85a;
+      --text:      #1a1a1a;
+      --muted:     #666666;
+      --danger:    #e05555;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 10%, rgba(124,92,191,0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 90%, rgba(45,91,227,0.03) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    /* Header */
+    .site-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+    .brand-tag {
+      display: inline-block;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #7c5cbf;
+      background: rgba(155,125,224,0.15);
+      border: 1px solid rgba(155,125,224,0.3);
+      padding: 8px 18px;
+      border-radius: 2px;
+      margin-bottom: 20px;
+    }
+    .site-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 6vw, 3.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .site-header h1 em {
+      font-style: italic;
+      color: var(--purple-lt);
+    }
+    .site-header p {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Progress */
+    .progress-wrap {
+      margin-bottom: 44px;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .progress-labels span {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      transition: color 0.3s;
+    }
+    .progress-labels span.active { color: var(--gold); font-weight: 600; }
+    .progress-bar-bg {
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--blue));
+      border-radius: 2px;
+      transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .step-counter {
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* Step cards */
+    .step { display: none; animation: fadeUp 0.4s ease both; }
+    .step.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-heading {
+      margin-bottom: 32px;
+    }
+    .step-heading h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .step-heading p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Field groups */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 560px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
+    .field {
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    label .req { color: var(--gold); margin-left: 2px; }
+    label .hint {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+      letter-spacing: 0;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-size: 16px;
+      padding: 14px 18px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(124,92,191,0.12);
+    }
+    input.error, select.error, textarea.error {
+      border-color: var(--danger);
+    }
+    textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+    select { cursor: pointer; }
+    select option { background: var(--card); }
+
+    ::placeholder { color: #444460; }
+
+    /* Checkbox and radio groups */
+    .check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 480px) { .check-grid { grid-template-columns: 1fr; } }
+    .check-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 560px) { .check-grid.cols-3 { grid-template-columns: 1fr 1fr; } }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .check-item:hover { border-color: var(--purple); }
+    .check-item input[type="checkbox"],
+    .check-item input[type="radio"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--purple);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .check-item span {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .check-item:has(input:checked) {
+      border-color: var(--purple);
+      background: rgba(124,92,191,0.08);
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    /* Section subtitle inside step */
+    .section-sub {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-sub::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Nav buttons */
+    .nav-buttons {
+      display: flex;
+      gap: 14px;
+      margin-top: 36px;
+      align-items: center;
+    }
+    .btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 25px 32px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: #7c5cbf;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #9b7de0;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124,92,191,0.4);
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-ghost:hover {
+      border-color: var(--purple);
+      color: var(--text);
+    }
+    .btn-submit {
+      background: #7c5cbf;
+      color: #fff;
+      padding: 25px 40px;
+    }
+    .btn-submit:hover {
+      background: #9b7de0;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(155,125,224,0.4);
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* Error message */
+    .err-msg {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 5px;
+      display: none;
+    }
+
+    /* Success screen */
+    #success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(201,151,58,0.1);
+      border: 1px solid rgba(201,151,58,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      font-size: 28px;
+    }
+    #success-screen h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    #success-screen p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* Footer */
+    .form-footer {
+      text-align: center;
+      margin-top: 52px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .form-footer a { color: var(--purple-lt); text-decoration: none; }
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site-header">
+    <div class="brand-tag">Bofast World</div>
+    <h1>Your Project<br><em>Brief Form</em></h1>
+    <p>Tell us about your vision. The more detail you share, the more accurate your proposal will be. This takes about 5 to 8 minutes.</p>
+  </header>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span id="lbl-1" class="active">Business</span>
+      <span id="lbl-2">Vision</span>
+      <span id="lbl-3">Design</span>
+      <span id="lbl-4">Pages &amp; Features</span>
+      <span id="lbl-5">Final Details</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:20%"></div>
+    </div>
+    <div class="step-counter" id="step-counter">Step 1 of 5</div>
+  </div>
+
+  <form id="intake-form" novalidate>
+
+    <!-- Hidden Web3Forms key -->
+    <input type="hidden" name="access_key" value="14d73b78-2707-4cab-b3c6-3fd775cd4735">
+    <input type="hidden" name="subject" value="New Project Brief Submission">
+    <input type="hidden" name="from_name" value="Bofast World Intake Form">
+    <input type="checkbox" name="botcheck" style="display:none">
+
+    <!-- ===== STEP 1: ABOUT YOUR BUSINESS ===== -->
+    <div class="step active" id="step-1">
+      <div class="step-heading">
+        <h2>About Your Business</h2>
+        <p>Let us get to know you and what you do before we talk about the website.</p>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="contact_name">Your Full Name <span class="req">*</span></label>
+          <input type="text" id="contact_name" name="contact_name" placeholder="John Adeyemi" required>
+          <div class="err-msg" id="err-contact_name">Please enter your full name.</div>
+        </div>
+        <div class="field">
+          <label for="business_name">Business / Agency Name <span class="req">*</span></label>
+          <input type="text" id="business_name" name="business_name" placeholder="Your Agency Ltd" required>
+          <div class="err-msg" id="err-business_name">Please enter your business name.</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="email">Email Address <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="you@youragency.com" required>
+          <div class="err-msg" id="err-email">Please enter a valid email address.</div>
+        </div>
+        <div class="field">
+          <label for="whatsapp">WhatsApp Number <span class="req">*</span></label>
+          <input type="tel" id="whatsapp" name="whatsapp" placeholder="+234 800 000 0000" required>
+          <div class="err-msg" id="err-whatsapp">Please enter your WhatsApp number.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="location">Business Location <span class="req">*</span></label>
+        <input type="text" id="location" name="location" placeholder="e.g. Lagos, Nigeria" required>
+        <div class="err-msg" id="err-location">Please enter your business location.</div>
+      </div>
+
+      <div class="field">
+        <label for="services_offered">
+          What services does your agency offer? <span class="req">*</span>
+          <span class="hint">List all of them, one per line or separated by commas.</span>
+        </label>
+        <textarea id="services_offered" name="services_offered" rows="4" placeholder="e.g. Web Design, Digital Marketing, Online Courses, SEO, Social Media Management, Brand Identity..." required></textarea>
+        <div class="err-msg" id="err-services_offered">Please list your agency services.</div>
+      </div>
+
+      <div class="field">
+        <label for="current_website">Do you currently have a website?</label>
+        <input type="url" id="current_website" name="current_website" placeholder="https://yoursite.com (leave blank if none)">
+      </div>
+
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-primary" onclick="nextStep(1)">Continue &rarr;</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 2: WEBSITE VISION ===== -->
+    <div class="step" id="step-2">
+      <div class="step-heading">
+        <h2>Your Website Vision</h2>
+        <p>Help us understand what you want this website to do for your business.</p>
+      </div>
+
+      <div class="field">
+        <label>What is the primary goal of this website? <span class="req">*</span></label>
+        <div class="check-grid" style="margin-top:4px">
+          <label class="check-item"><input type="radio" name="primary_goal" value="Attract new clients"> <span>Attract new clients</span></label>
+          <label class="check-item"><input type="radio" name="primary_goal" value="Showcase portfolio/work"> <span>Showcase portfolio and work</span></label>
+          <label class="check-item"><input type="radio" name="primary_goal" value="Sell courses or products"> <span>Sell courses or products</span></label>
+          <label class="check-item"><input type="radio" name="primary_goal" value="Generate leads and enquiries"> <span>Generate leads and enquiries</span></label>
+          <label class="check-item"><input type="radio" name="primary_goal" value="Establish brand authority"> <span>Establish brand authority</span></label>
+          <label class="check-item"><input type="radio" name="primary_goal" value="All of the above"> <span>All of the above</span></label>
+        </div>
+        <div class="err-msg" id="err-primary_goal">Please select the primary goal.</div>
+      </div>
+
+      <div class="field">
+        <label for="target_audience">
+          Who is your target audience? <span class="req">*</span>
+          <span class="hint">Describe who you want to reach with this website.</span>
+        </label>
+        <textarea id="target_audience" name="target_audience" rows="3" placeholder="e.g. Small business owners in Lagos looking for digital marketing services, professionals seeking to upskill online..." required></textarea>
+        <div class="err-msg" id="err-target_audience">Please describe your target audience.</div>
+      </div>
+
+      <div class="field">
+        <label>What is the ONE action you most want visitors to take when they land on your site?</label>
+        <div class="check-grid" style="margin-top:4px">
+          <label class="check-item"><input type="radio" name="visitor_action" value="Fill a contact form"> <span>Fill a contact form</span></label>
+          <label class="check-item"><input type="radio" name="visitor_action" value="Book a call or consultation"> <span>Book a call or consultation</span></label>
+          <label class="check-item"><input type="radio" name="visitor_action" value="Purchase a course or service"> <span>Purchase a course or service</span></label>
+          <label class="check-item"><input type="radio" name="visitor_action" value="Subscribe to newsletter"> <span>Subscribe to newsletter</span></label>
+          <label class="check-item"><input type="radio" name="visitor_action" value="Request a proposal or quote"> <span>Request a proposal or quote</span></label>
+          <label class="check-item"><input type="radio" name="visitor_action" value="Follow on social media"> <span>Follow on social media</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="sites_love">
+          List 2 to 3 websites (in any industry) that you love and briefly say why.
+          <span class="hint">This helps us understand your aesthetic taste.</span>
+        </label>
+        <textarea id="sites_love" name="sites_love" rows="3" placeholder="e.g. apple.com because of the clean layout and bold typography..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="sites_dislike">
+          Is there anything specific you strongly dislike in web design?
+          <span class="hint">Styles, colors, layouts, anything you want us to avoid.</span>
+        </label>
+        <textarea id="sites_dislike" name="sites_dislike" rows="2" placeholder="e.g. Cluttered layouts, too many popups, dark red colors..."></textarea>
+      </div>
+
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-ghost" onclick="prevStep(2)">&larr; Back</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Continue &rarr;</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3: DESIGN PREFERENCES ===== -->
+    <div class="step" id="step-3">
+      <div class="step-heading">
+        <h2>Design Preferences</h2>
+        <p>Tell us about your brand look and feel so we can design something that truly represents you.</p>
+      </div>
+
+      <p class="section-sub">Brand Assets</p>
+
+      <div class="field">
+        <label>Do you have a logo? <span class="req">*</span></label>
+        <div class="check-grid" style="margin-top:4px">
+          <label class="check-item"><input type="radio" name="has_logo" value="Yes, I have a logo and will send it"> <span>Yes, I have one and will send it</span></label>
+          <label class="check-item"><input type="radio" name="has_logo" value="I have a logo but it needs updating"> <span>I have one but it needs updating</span></label>
+          <label class="check-item"><input type="radio" name="has_logo" value="No logo yet, need one designed"> <span>No logo yet, I need one designed</span></label>
+          <label class="check-item"><input type="radio" name="has_logo" value="No logo, but not required now"> <span>No logo and not required now</span></label>
+        </div>
+        <div class="err-msg" id="err-has_logo">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label for="brand_colors">
+          What are your brand colors?
+          <span class="hint">If you know your hex codes, include them. If not, describe what you have in mind.</span>
+        </label>
+        <textarea id="brand_colors" name="brand_colors" rows="2" placeholder="e.g. Deep navy blue (#0a1f44) and gold (#d4a843), or: I want something dark and professional with orange accents..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="brand_fonts">
+          Do you have preferred fonts or a font style in mind?
+          <span class="hint">Name specific fonts if you know them or describe the style you want.</span>
+        </label>
+        <input type="text" id="brand_fonts" name="brand_fonts" placeholder="e.g. Modern sans-serif, or: I like the font on that Apple website...">
+      </div>
+
+      <hr class="divider">
+      <p class="section-sub">Overall Feel</p>
+
+      <div class="field">
+        <label>How do you want the website to feel? Select all that apply.</label>
+        <div class="check-grid cols-3" style="margin-top:4px">
+          <label class="check-item"><input type="checkbox" name="site_feel[]" value="Professional and corporate"> <span>Professional and corporate</span></label>
+          <label class="check-item"><input type="checkbox" name="site_feel[]" value="Creative and bold"> <span>Creative and bold</span></label>
+          <label class="check-item"><input type="checkbox" name="site_feel[]" value="Minimal and clean"> <span>Minimal and clean</span></label>
+          <label class="check-item"><input type="checkbox" name="site_feel[]" value="Luxury and premium"> <span>Luxury and premium</span></label>
+          <label class="check-item"><input type="checkbox" name="site_feel[]" value="Energetic and dynamic"> <span>Energetic and dynamic</span></label>
+          <label class="check-item"><input type="checkbox" name="site_feel[]" value="Friendly and approachable"> <span>Friendly and approachable</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="feel_extra">Anything else about the look or feel you want to communicate?</label>
+        <textarea id="feel_extra" name="feel_extra" rows="2" placeholder="e.g. I want it to feel more international than local, or: I want it to stand out from other agencies in Nigeria..."></textarea>
+      </div>
+
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-ghost" onclick="prevStep(3)">&larr; Back</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(3)">Continue &rarr;</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 4: PAGES AND FEATURES ===== -->
+    <div class="step" id="step-4">
+      <div class="step-heading">
+        <h2>Pages &amp; Features</h2>
+        <p>Select every page and feature you want on your website. Do not worry about being too detailed here, we will refine this together.</p>
+      </div>
+
+      <p class="section-sub">Pages You Need</p>
+
+      <div class="field">
+        <div class="check-grid cols-3">
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Home"> <span>Home</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="About Us"> <span>About Us</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Services"> <span>Services</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Portfolio / Case Studies"> <span>Portfolio / Case Studies</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Team / Meet Us"> <span>Team / Meet Us</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Blog / Resources"> <span>Blog / Resources</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Courses / Learning"> <span>Courses / Learning</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Pricing"> <span>Pricing</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Testimonials"> <span>Testimonials</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="FAQ"> <span>FAQ</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Contact"> <span>Contact</span></label>
+          <label class="check-item"><input type="checkbox" name="pages[]" value="Privacy Policy / Terms"> <span>Privacy Policy / Terms</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="extra_pages">Any other pages not listed above?</label>
+        <input type="text" id="extra_pages" name="extra_pages" placeholder="e.g. Client portal, Careers page, Custom landing page...">
+      </div>
+
+      <hr class="divider">
+      <p class="section-sub">Features and Functionality</p>
+
+      <div class="field">
+        <div class="check-grid">
+          <label class="check-item"><input type="checkbox" name="features[]" value="Contact form"> <span>Contact form</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Online booking or appointment system"> <span>Online booking or appointment</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Live chat widget"> <span>Live chat widget</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Course or LMS platform"> <span>Course or LMS platform</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Payment integration"> <span>Payment integration</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Client portal or dashboard"> <span>Client portal or dashboard</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Newsletter signup"> <span>Newsletter signup</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Social media feed or links"> <span>Social media feed or links</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Search functionality"> <span>Search functionality</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Multi-language support"> <span>Multi-language support</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="WhatsApp chat button"> <span>WhatsApp chat button</span></label>
+          <label class="check-item"><input type="checkbox" name="features[]" value="Pop-up or lead capture"> <span>Pop-up or lead capture</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="extra_features">Any other features or specific requirements?</label>
+        <textarea id="extra_features" name="extra_features" rows="2" placeholder="Describe anything specific you have in mind..."></textarea>
+      </div>
+
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-ghost" onclick="prevStep(4)">&larr; Back</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(4)">Continue &rarr;</button>
+      </div>
+    </div>
+
+    <!-- ===== STEP 5: FINAL DETAILS ===== -->
+    <div class="step" id="step-5">
+      <div class="step-heading">
+        <h2>Final Details</h2>
+        <p>Almost done. A few last things to help us put together your proposal.</p>
+      </div>
+
+      <p class="section-sub">Content and Assets</p>
+
+      <div class="field">
+        <label>How ready is your website content? <span class="req">*</span>
+          <span class="hint">Content means your written text, images, videos, and other media.</span>
+        </label>
+        <div class="check-grid" style="margin-top:4px">
+          <label class="check-item"><input type="radio" name="content_readiness" value="Everything is ready, I will provide all content"> <span>Everything is ready, I will provide all</span></label>
+          <label class="check-item"><input type="radio" name="content_readiness" value="Partially ready, some content exists"> <span>Partially ready, some content exists</span></label>
+          <label class="check-item"><input type="radio" name="content_readiness" value="Not ready, I need help with content creation"> <span>Not ready, I need help with content</span></label>
+          <label class="check-item"><input type="radio" name="content_readiness" value="No content yet but I can prepare it quickly"> <span>No content yet but I can prepare quickly</span></label>
+        </div>
+        <div class="err-msg" id="err-content_readiness">Please select your content readiness.</div>
+      </div>
+
+      <hr class="divider">
+      <p class="section-sub">Technical Setup</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="domain">Do you have a domain name?
+            <span class="hint">Leave blank if you do not have one yet.</span>
+          </label>
+          <input type="text" id="domain" name="domain" placeholder="e.g. youragency.com">
+        </div>
+        <div class="field">
+          <label for="hosting">Do you have web hosting?
+            <span class="hint">Provider name if yes, e.g. Namecheap, Whogohost.</span>
+          </label>
+          <input type="text" id="hosting" name="hosting" placeholder="e.g. Namecheap (or leave blank)">
+        </div>
+      </div>
+
+      <hr class="divider">
+      <p class="section-sub">Timeline and Budget</p>
+
+      <div class="field">
+        <label>When do you need the website ready? <span class="req">*</span></label>
+        <select id="timeline" name="timeline" required>
+          <option value="" disabled selected>Select a timeframe</option>
+          <option value="ASAP (within 1 week)">As soon as possible (within 1 week)</option>
+          <option value="Within 2 weeks">Within 2 weeks</option>
+          <option value="Within 1 month">Within 1 month</option>
+          <option value="1 to 2 months">1 to 2 months</option>
+          <option value="Flexible, no rush">Flexible, no rush</option>
+        </select>
+        <div class="err-msg" id="err-timeline">Please select your expected timeline.</div>
+      </div>
+
+      <div class="field">
+        <label>What is your budget range for this project? <span class="req">*</span></label>
+        <select id="budget" name="budget" required>
+          <option value="" disabled selected>Select a budget range</option>
+          <option value="Below ₦150,000">Below ₦150,000</option>
+          <option value="₦150,000 to ₦300,000">₦150,000 to ₦300,000</option>
+          <option value="₦300,000 to ₦500,000">₦300,000 to ₦500,000</option>
+          <option value="₦500,000 to ₦1,000,000">₦500,000 to ₦1,000,000</option>
+          <option value="Above ₦1,000,000">Above ₦1,000,000</option>
+          <option value="Open to discussion">Open to discussion</option>
+        </select>
+        <div class="err-msg" id="err-budget">Please select a budget range.</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field">
+        <label for="competitors">Who are your main competitors or businesses you look up to in your industry?</label>
+        <textarea id="competitors" name="competitors" rows="2" placeholder="e.g. Agency X in Lagos, Agency Y in Abuja..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="extra_notes">Any final notes, specific requests, or questions for us?</label>
+        <textarea id="extra_notes" name="extra_notes" rows="3" placeholder="Anything else you want us to know before we put together your proposal..."></textarea>
+      </div>
+
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-ghost" onclick="prevStep(5)">&larr; Back</button>
+        <button type="submit" class="btn btn-submit" id="submit-btn">Submit Brief &rarr;</button>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Success Screen -->
+  <div id="success-screen">
+    <div class="success-icon">✓</div>
+    <h2>Brief Received!</h2>
+    <p>Thank you for filling out your project brief. We will review your details and get back to you within 24 to 48 hours with a tailored proposal.</p>
+    <br>
+    <p style="font-size:13px; color:var(--muted)">If you have brand assets (logo, images, documents) to share, please send them to <a href="mailto:hello@bofastworld.net">hello@bofastworld.net</a> or via WhatsApp.</p>
+  </div>
+
+  <footer class="form-footer">
+    <p>Submitted briefs are reviewed by <a href="https://bofastworld.net" target="_blank">Bofast World</a> within 24 to 48 hours.</p>
+    <p style="margin-top:6px">Questions? Reach us at <a href="mailto:hello@bofastworld.net">hello@bofastworld.net</a></p>
+  </footer>
+
+</div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 5;
+
+  const progressMap = {1:20, 2:40, 3:60, 4:80, 5:100};
+  const labelMap    = {1:'Business', 2:'Vision', 3:'Design', 4:'Pages & Features', 5:'Final Details'};
+
+  function updateProgress(step) {
+    document.getElementById('progress-fill').style.width = progressMap[step] + '%';
+    document.getElementById('step-counter').textContent = 'Step ' + step + ' of ' + totalSteps;
+    for (let i = 1; i <= totalSteps; i++) {
+      const el = document.getElementById('lbl-' + i);
+      el.classList.toggle('active', i === step);
+    }
+  }
+
+  function showStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + step).classList.add('active');
+    currentStep = step;
+    updateProgress(step);
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  function validateStep(step) {
+    let valid = true;
+
+    const requiredFields = {
+      1: ['contact_name','business_name','email','whatsapp','location','services_offered'],
+      2: [],
+      3: [],
+      4: [],
+      5: ['timeline','budget','content_readiness']
+    };
+
+    // Clear previous errors
+    document.querySelectorAll('.err-msg').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+
+    // Text/select/textarea fields
+    (requiredFields[step] || []).forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        const err = document.getElementById('err-' + id);
+        if (err) err.style.display = 'block';
+        valid = false;
+      }
+    });
+
+    // Email validation
+    if (step === 1) {
+      const emailEl = document.getElementById('email');
+      if (emailEl && emailEl.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
+        emailEl.classList.add('error');
+        document.getElementById('err-email').style.display = 'block';
+        valid = false;
+      }
+    }
+
+    // Radio groups
+    const radioGroups = {
+      2: ['primary_goal'],
+      3: ['has_logo'],
+      5: ['content_readiness']
+    };
+    (radioGroups[step] || []).forEach(name => {
+      const checked = document.querySelector('input[name="' + name + '"]:checked');
+      if (!checked) {
+        const err = document.getElementById('err-' + name);
+        if (err) err.style.display = 'block';
+        valid = false;
+      }
+    });
+
+    return valid;
+  }
+
+  function nextStep(current) {
+    if (!validateStep(current)) return;
+    if (current < totalSteps) showStep(current + 1);
+  }
+
+  function prevStep(current) {
+    if (current > 1) showStep(current - 1);
+  }
+
+  // Form submission
+  document.getElementById('intake-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!validateStep(5)) return;
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+      const formData = new FormData(this);
+
+      // Collect checked checkboxes into readable strings
+      ['site_feel[]','pages[]','features[]'].forEach(name => {
+        const checked = [...document.querySelectorAll('input[name="' + name + '"]:checked')]
+                        .map(el => el.value);
+        formData.delete(name);
+        formData.set(name.replace('[]',''), checked.join(', ') || 'None selected');
+      });
+
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('intake-form').style.display = 'none';
+        document.querySelector('.progress-wrap').style.display = 'none';
+        document.getElementById('success-screen').style.display = 'block';
+      } else {
+        alert('Something went wrong. Please try again or send us an email directly.');
+        btn.disabled = false;
+        btn.textContent = 'Submit Brief →';
+      }
+    } catch (err) {
+      alert('A network error occurred. Please check your connection and try again.');
+      btn.disabled = false;
+      btn.textContent = 'Submit Brief →';
+    }
+  });
+</script>
+</body>
+</html>
